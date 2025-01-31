@@ -1,50 +1,37 @@
-const axios = require("axios");
-const fs = require("fs");
-const json = require("./bankDetails.json");
+// Import required modules
+const fs = require('fs');
 
-async function voiceapi(payload) {
-  let result;
-  const axiosConfig = {
-    headers: {
-      "appId": "0708775d-c6af-4a88-ac47-346571727a0a",
-      "Content-Type": "application/json"
-    },
-  };
+// Read JSON data from a file
+const filePath = 'input.json'; // Replace with your JSON file path
 
-  try {
-    const res = await axios.post(
-      "https://pmkisan.corover.ai/pmkisanAPI/nlp/VoiceApiBhashini/as",
-      payload,
-      axiosConfig
-    );
-    result = res.data;
-  } catch (error) {
-    console.error(error);
-    result = null;
-  }
-
-  return result;
+// Function to fix anchor tags
+function fixAnchorTags(jsonArray) {
+    return jsonArray.map(item => {
+        item.Answer_hi = item.Answer_hi.replace(/<a href=([^\s>]+)\s+target=_blank>([^<]+)<\/a>/g, '<a href="$1" target="_blank">$2</a>');
+        return item;
+    });
 }
 
-async function main() {
-  const output = [];
-
-  for (let i = 0; i < json.length; i++) {
-    const bankUrl = json[i].bankUrl || "ইয়াত";
-    const payload = {
-      Text: `নিশ্চয়, '${json[i].bank_name}' ৰ যোগাযোগৰ তথ্য আপোনালোকক শ্বেয়াৰ কৰিব পাৰিম। আপুনি '${json[i].customer_care}' নম্বৰত যোগাযোগ কৰিব পাৰে। বা '${json[i].email_Id}' লৈ লিখক। বা আপুনি চাব পাৰে '${json[i].bankUrl}'`
-    };
-
-    const result = await voiceapi(payload);
-    if (result) {
-      output.push({
-        input: payload.Text,
-        output: result,
-      });
+// Read and process the JSON file
+fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading the file:', err);
+        return;
     }
-  } 
 
-  fs.writeFileSync("output.json", JSON.stringify(output, null, 2));
-}
+    try {
+        const jsonData = JSON.parse(data);
+        const fixedData = fixAnchorTags(jsonData);
 
-main();
+        // Write the fixed JSON back to the file
+        fs.writeFile(filePath, JSON.stringify(fixedData, null, 2), 'utf8', writeErr => {
+            if (writeErr) {
+                console.error('Error writing to the file:', writeErr);
+            } else {
+                console.log('Anchor tags have been fixed and the file has been updated.');
+            }
+        });
+    } catch (parseErr) {
+        console.error('Error parsing the JSON:', parseErr);
+    }
+});
