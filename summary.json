@@ -1,0 +1,56 @@
+{
+  "totalBanks": 20,
+  "totalLanguages": 9,
+  "totalAudios": 180,
+  "successfulAudios": 180,
+  "failedAudios": 0,
+  "successRate": 100,
+  "languageStats": {
+    "english": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "hindi": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "punjabi": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "gujarati": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "marathi": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "bengali": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "telugu": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "tamil": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    },
+    "malayalam": {
+      "success": 20,
+      "total": 20,
+      "rate": 100
+    }
+  },
+  "generated_timestamp": "2025-12-11T08:59:17.976Z"
+}
