@@ -5,62 +5,168 @@ const fs = require("fs");
 // Read input.json file
 const bankData = JSON.parse(fs.readFileSync("./input.json", "utf8"));
 
+// Function to convert spaced numbers to spoken format
+function convertToSpokenNumbers(spacedNumbers) {
+  if (!spacedNumbers) return "";
+  
+  // Split by spaces and convert each digit to word
+  const parts = spacedNumbers.split(' ');
+  const spokenParts = parts.map(part => {
+    // If it's a digit, convert to word
+    if (/^\d$/.test(part)) {
+      const digitWords = {
+        '0': 'zero',
+        '1': 'one',
+        '2': 'two',
+        '3': 'three',
+        '4': 'four',
+        '5': 'five',
+        '6': 'six',
+        '7': 'seven',
+        '8': 'eight',
+        '9': 'nine'
+      };
+      return digitWords[part] || part;
+    }
+    return part; // Return non-digit parts as is
+  });
+  
+  return spokenParts.join(' ');
+}
+
 // Language configurations
 const languages = {
-  english: {
-    code: "en",
-    api: "corover", // corover or newvoice
-    textFunction: (bank) => `Sure, I can share you the contact details of ${bank.bank_name}. You can contact at ${bank.customer_care}. Or write to ${bank.email_Id}. Or you can visit ${bank.bankUrl}.`
-  },
   hindi: {
     code: "hi",
     api: "corover",
-    textFunction: (bank) => `ज़रूर, मैं आपको ${bank.bank_name} का संपर्क विवरण साझा कर सकता हूँ। आप ${bank.customer_care} पर संपर्क कर सकते हैं। या ${bank.email_Id} पर लिख सकते हैं। या आप ${bank.bankUrl} पर विजिट कर सकते हैं।`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `बिल्कुल, मैं आपको ${bank.bank_name} के संपर्क विवरण शेयर कर सकती हूं। आप ${spokenNumbers} पर संपर्क कर सकते हैं।`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` या आप ${bank.email_Id} पर लिख सकते हैं।`;
+      }
+      return text;
+    }
   },
   punjabi: {
     code: "pa",
     api: "corover",
-    textFunction: (bank) => `ਜ਼ਰੂਰ, ਮੈਂ ਤੁਹਾਨੂੰ ${bank.bank_name} ਦੇ ਸੰਪਰਕ ਵੇਰਵੇ ਸਾਂਝੇ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ${bank.customer_care} 'ਤੇ ਸੰਪਰਕ ਕਰ ਸਕਦੇ ਹੋ। ਜਾਂ ${bank.email_Id} 'ਤੇ ਲਿਖ ਸਕਦੇ ਹੋ। ਜਾਂ ਤੁਸੀਂ ${bank.bankUrl} 'ਤੇ ਵਿਜ਼ਿਟ ਕਰ ਸਕਦੇ ਹੋ।`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `ਜ਼ਰੂਰ, ਮੈਂ ਤੁਹਾਨੂੰ ${bank.bank_name} ਦੇ ਸੰਪਰਕ ਵੇਰਵੇ ਸਾਂਝੇ ਕਰ ਸਕਦਾ ਹਾਂ। ਤੁਸੀਂ ${spokenNumbers} 'ਤੇ ਸੰਪਰਕ ਕਰ ਸਕਦੇ ਹੋ।`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` ਜਾਂ ${bank.email_Id} 'ਤੇ ਲਿਖ ਸਕਦੇ ਹੋ।`;
+      }
+      return text;
+    }
   },
   gujarati: {
     code: "gu",
     api: "corover",
-    textFunction: (bank) => `ચોક્કસ, હું તમને ${bank.bank_name} ની સંપર્ક વિગતો શેર કરી શકું છું. તમે ${bank.customer_care} પર સંપર્ક કરી શકો છો. અથવા ${bank.email_Id} પર લખી શકો છો. અથવા તમે ${bank.bankUrl} પર મુલાકાત લઈ શકો છો.`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `ચોક્કસ, હું તમને ${bank.bank_name} ની સંપર્ક વિગતો શેર કરી શકું છું. તમે ${spokenNumbers} પર સંપર્ક કરી શકો છો.`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` અથવા ${bank.email_Id} પર લખી શકો છો.`;
+      }
+      return text;
+    }
   },
   marathi: {
     code: "mr",
     api: "corover",
-    textFunction: (bank) => `नक्कीच, मी तुम्हाला ${bank.bank_name} ची संपर्क माहिती सामायिक करू शकतो. तुम्ही ${bank.customer_care} येथे संपर्क साधू शकता. किंवा ${bank.email_Id} येथे लिहू शकता. किंवा तुम्ही ${bank.bankUrl} येथे भेट देऊ शकता.`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `नक्कीच, मी तुम्हाला ${bank.bank_name} ची संपर्क माहिती सामायिक करू शकतो. तुम्ही ${spokenNumbers} येथे संपर्क साधू शकता.`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` किंवा ${bank.email_Id} येथे लिहू शकता.`;
+      }
+      return text;
+    }
   },
   bengali: {
     code: "bn",
     api: "corover",
-    textFunction: (bank) => `নিশ্চয়, আমি আপনাকে ${bank.bank_name} এর যোগাযোগের বিবরণ শেয়ার করতে পারি। আপনি ${bank.customer_care} এ যোগাযোগ করতে পারেন। অথবা ${bank.email_Id} এ লিখতে পারেন। অথবা আপনি ${bank.bankUrl} পরিদর্শন করতে পারেন।`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `নিশ্চয়, আমি আপনাকে ${bank.bank_name} এর যোগাযোগের বিবরণ শেয়ার করতে পারি। আপনি ${spokenNumbers} এ যোগাযোগ করতে পারেন।`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` অথবা ${bank.email_Id} এ লিখতে পারেন।`;
+      }
+      return text;
+    }
   },
   telugu: {
     code: "te",
     api: "corover",
-    textFunction: (bank) => `ఖచ్చితంగా, నేను మీకు ${bank.bank_name} యొక్క సంప్రదింపు వివరాలను పంచుకోగలను. మీరు ${bank.customer_care} వద్ద సంప్రదించవచ్చు. లేదా ${bank.email_Id} కి వ్రాయండి. లేదా మీరు ${bank.bankUrl} ని సందర్శించవచ్చు.`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `ఖచ్చితంగా, నేను మీకు ${bank.bank_name} యొక్క సంప్రదింపు వివరాలను పంచుకోగలను. మీరు ${spokenNumbers} వద్ద సంప్రదించవచ్చు.`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` లేదా ${bank.email_Id} కి వ్రాయండి.`;
+      }
+      return text;
+    }
   },
   tamil: {
     code: "ta",
     api: "corover",
-    textFunction: (bank) => `நிச்சயமாக, நான் உங்களுக்கு ${bank.bank_name} இன் தொடர்பு விவரங்களைப் பகிர்ந்து கொள்ள முடியும். நீங்கள் ${bank.customer_care} இல் தொடர்பு கொள்ளலாம். அல்லது ${bank.email_Id} க்கு எழுதலாம். அல்லது நீங்கள் ${bank.bankUrl} ஐப் பார்வையிடலாம்.`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `நிச்சயமாக, நான் உங்களுக்கு ${bank.bank_name} இன் தொடர்பு விவரங்களைப் பகிர்ந்து கொள்ள முடியும். நீங்கள் ${spokenNumbers} இல் தொடர்பு கொள்ளலாம்.`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` அல்லது ${bank.email_Id} க்கு எழுதலாம்.`;
+      }
+      return text;
+    }
   },
   malayalam: {
     code: "ml",
     api: "corover",
-    textFunction: (bank) => `തീർച്ചയായും, എനിക്ക് നിങ്ങൾക്ക് ${bank.bank_name} ന്റെ കോൺടാക്ട് വിശദാംശങ്ങൾ പങ്കിടാൻ കഴിയും. നിങ്ങൾക്ക് ${bank.customer_care} എന്ന നമ്പറിൽ ബന്ധപ്പെടാം. അല്ലെങ്കിൽ ${bank.email_Id} എന്നതിലേക്ക് എഴുതുക. അല്ലെങ്കിൽ നിങ്ങൾക്ക് ${bank.bankUrl} സന്ദർശിക്കാം.`
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `തീർച്ചയായും, എനിക്ക് നിങ്ങൾക്ക് ${bank.bank_name} ന്റെ കോൺടാക്ട് വിശദാംശങ്ങൾ പങ്കിടാൻ കഴിയും. നിങ്ങൾക്ക് ${spokenNumbers} എന്ന നമ്പറിൽ ബന്ധപ്പെടാം.`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` അല്ലെങ്കിൽ ${bank.email_Id} എന്നതിലേക്ക് എഴുതുക.`;
+      }
+      return text;
+    }
   },
   assamese: {
     code: "asm",
-    api: "newvoice", // Using NewVoice API
-    textFunction: (bank) => `নিশ্চয়, মই আপোনাক ${bank.bank_name} ৰ যোগাযোগৰ তথ্য শ্বেয়াৰ কৰিব পাৰো। আপুনি ${bank.customer_care} ত যোগাযোগ কৰিব পাৰে। বা ${bank.email_Id} লৈ লিখিব পাৰে। বা আপুনি ${bank.bankUrl} ভিজিট কৰিব পাৰে।`
+    api: "newvoice",
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `নিশ্চয়, মই আপোনাক ${bank.bank_name} ৰ যোগাযোগৰ তথ্য শ্বেয়াৰ কৰিব পাৰো। আপুনি ${spokenNumbers} ত যোগাযোগ কৰিব পাৰে।`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` বা ${bank.email_Id} লৈ লিখিব পাৰে।`;
+      }
+      return text;
+    }
   },
   odia: {
     code: "or",
-    api: "newvoice", // Using NewVoice API
-    textFunction: (bank) => `ନିଶ୍ଚିତ, ମୁଁ ଆପଣଙ୍କୁ ${bank.bank_name} ର ସମ୍ପର୍କ ବିବରଣୀ ଅଂଶୀଦାର କରିପାରିବି। ଆପଣ ${bank.customer_care} ରେ ସମ୍ପର୍କ କରିପାରିବେ। କିମ୍ବା ${bank.email_Id} ରେ ଲେଖିପାରିବେ। କିମ୍ବା ଆପଣ ${bank.bankUrl} ବୁଲିପାରିବେ।`
+    api: "newvoice",
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `ନିଶ୍ଚିତ, ମୁଁ ଆପଣଙ୍କୁ ${bank.bank_name} ର ସମ୍ପର୍କ ବିବରଣୀ ଅଂଶୀଦାର କରିପାରିବି। ଆପଣ ${spokenNumbers} ରେ ସମ୍ପର୍କ କରିପାରିବେ।`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` କିମ୍ବା ${bank.email_Id} ରେ ଲେଖିପାରିବେ।`;
+      }
+      return text;
+    }
+  },
+  english: {
+    code: "en",
+    api: "corover",
+    textFunction: (bank) => {
+      const spokenNumbers = convertToSpokenNumbers(bank.customer_care);
+      let text = `Sure, I can share you the contact details of ${bank.bank_name}. You can contact at ${spokenNumbers}.`;
+      if (bank.email_Id && bank.email_Id.trim() !== "") {
+        text += ` Or write to ${bank.email_Id}.`;
+      }
+      return text;
+    }
   }
 };
 
@@ -350,16 +456,21 @@ async function main() {
   console.log("   - Corover API: English, Hindi, Punjabi, Gujarati, Marathi, Bengali, Telugu, Tamil, Malayalam");
   console.log("   - NewVoice Bhashini API: Assamese, Odia");
   console.log("=".repeat(80));
+  console.log("📞 Number Conversion: All phone numbers will be spoken as words (1 -> one, 2 -> two, etc.)");
+  console.log("=".repeat(80));
 
   for (let bankIndex = 0; bankIndex < bankData.length; bankIndex++) {
     const bank = bankData[bankIndex];
     
     console.log(`\n🔵 Bank ${bankIndex + 1}/${bankData.length}: ${bank.bank_name}`);
+    console.log(`   Original customer care: ${bank.customer_care}`);
+    console.log(`   Spoken format: ${convertToSpokenNumbers(bank.customer_care)}`);
     console.log("-".repeat(80));
 
     const bankResult = {
       bank_name: bank.bank_name,
       customer_care: bank.customer_care,
+      spoken_customer_care: convertToSpokenNumbers(bank.customer_care),
       email_Id: bank.email_Id,
       bankUrl: bank.bankUrl,
       audios: [],
@@ -425,6 +536,7 @@ async function main() {
   // Also save a simplified version
   const simplifiedOutput = output.map(bank => ({
     bank_name: bank.bank_name,
+    spoken_customer_care: bank.spoken_customer_care,
     audios: bank.audios.map(audio => ({
       language: audio.language,
       audio_url: audio.audio_url,
@@ -508,7 +620,8 @@ function generateSummary(output) {
         asm: "https://pmkisan.corover.ai/pmkisanAPI/nlp/VoiceApiBhashini/as",
         or: "https://pmkisan.corover.ai/pmkisanAPI/nlp/VoiceApiBhashini/or"
       }
-    }
+    },
+    number_conversion: "All digits converted to spoken words (1->one, 2->two, etc.)"
   };
 }
 
@@ -520,10 +633,10 @@ try {
     console.log("\nExample input.json format:");
     console.log(JSON.stringify([
       {
-        "bank_name": "The South Indian Bank",
-        "customer_care": "18004251809 or 18001029408",
-        "email_Id": "customercare@sib.co.in",
-        "bankUrl": "https://www.southindianbank.com"
+        "bank_name": "HDFC Bank",
+        "customer_care": "1 8 0 0 2 6 6 3 4 5 6",
+        "email_Id": "",
+        "bankUrl": "https://www.hdfc.bank.in/"
       }
     ], null, 2));
     process.exit(1);
